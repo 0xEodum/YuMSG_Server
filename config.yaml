@@ -1,0 +1,77 @@
+server:
+  host: "localhost"
+  port: 3939
+  read_timeout: "30s"
+  write_timeout: "30s"
+  idle_timeout: "120s"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "postpass"
+  dbname: "yumsg"
+  sslmode: "disable"
+
+jwt:
+  secret_key: "your-super-secret-jwt-key-change-this-in-production"
+  expiry_time: "24h"
+  refresh_time: "72h"
+  issuer: "yumsg-server"
+
+app:
+  version: "1.0.0"
+  environment: "development"
+  log_level: "info"
+  
+  organization:
+    id: "00000000-0000-0000-0000-000000000000"
+    name: "Default Organization"
+    domain: "localhost"
+  
+  supported_algorithms:
+    asymmetric:
+      - name: "NTRU"
+        description: "Решетчатый алгоритм"
+        key_size: 1024
+        recommended: true
+      - name: "BIKE"
+        description: "Код-основанный алгоритм"
+        key_size: 2048
+        recommended: false
+    symmetric:
+      - name: "AES-256"
+        description: "Стандарт шифрования"
+        key_size: 256
+        recommended: true
+      - name: "ChaCha20"
+        description: "Потоковый шифр"
+        key_size: 256
+        recommended: false
+    signature:
+      - name: "Falcon"
+        description: "Решетчатая подпись"
+        key_size: 1024
+        recommended: true
+      - name: "Dilithium"
+        description: "Модульная решетчатая подпись"
+        key_size: 2048
+        recommended: false
+  
+  server_policies:
+    max_file_size: 52428800        # 50MB
+    message_retention_days: 7
+    max_concurrent_connections: 1000
+    rate_limit_messages_per_minute: 60
+  
+  websocket:
+    heartbeat_interval: "10s"
+    connection_timeout: "60s"
+    max_message_size: 1048576      # 1MB
+
+cleanup:
+  enabled: true
+  run_interval: "1h"
+  expired_messages_age: "168h"     # 7 days
+  inactive_connection_age: "300s"  # 5 minutes
+  audit_log_retention: "720h"     # 30 days
