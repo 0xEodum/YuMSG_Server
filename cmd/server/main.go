@@ -48,7 +48,7 @@ func main() {
 	// Initialize services
 	authService := auth.NewAuthService(cfg)
 	organizationService := services.NewOrganizationService(db.DB, cfg)
-	userService := services.NewUserService(db.DB, authService, organizationService)
+	userService := services.NewUserService(db.DB, authService)
 	messageService := services.NewMessageService(db.DB, userService)
 
 	// Initialize WebSocket manager (using interfaces to break circular dependency)
@@ -188,14 +188,11 @@ func setupRoutes(
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
 	}
 
-	// Additional organization endpoints (admin only)
+	// Additional organization endpoints (admin only) - only stats for now
 	orgAdmin := v1.Group("/organizations")
 	orgAdmin.Use(authService.AuthMiddleware())
 	orgAdmin.Use(adminHandler.AdminMiddleware())
 	{
-		orgAdmin.GET("/", organizationHandler.GetAllOrganizations)
-		orgAdmin.POST("/", organizationHandler.CreateOrganization)
-		orgAdmin.PUT("/:id", organizationHandler.UpdateOrganization)
 		orgAdmin.GET("/stats", organizationHandler.GetOrganizationStats)
 	}
 }

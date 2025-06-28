@@ -73,7 +73,6 @@ func (d *Database) AutoMigrate() error {
 	log.Println("Running database migrations...")
 
 	err := d.DB.AutoMigrate(
-		&models.Organization{},
 		&models.User{},
 		&models.ActiveConnection{},
 		&models.ChatMetadata{},
@@ -90,11 +89,6 @@ func (d *Database) AutoMigrate() error {
 		return fmt.Errorf("failed to create indexes: %w", err)
 	}
 
-	// Create default organization if it doesn't exist
-	if err := d.createDefaultOrganization(); err != nil {
-		return fmt.Errorf("failed to create default organization: %w", err)
-	}
-
 	log.Println("Database migrations completed successfully")
 	return nil
 }
@@ -102,7 +96,6 @@ func (d *Database) AutoMigrate() error {
 // createIndexes creates additional database indexes
 func (d *Database) createIndexes() error {
 	indexes := []string{
-		"CREATE INDEX IF NOT EXISTS idx_users_organization ON users(organization_id)",
 		"CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)",
 		"CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username))",
 		"CREATE INDEX IF NOT EXISTS idx_users_display_name_gin ON users USING gin(to_tsvector('english', display_name))",
@@ -125,77 +118,6 @@ func (d *Database) createIndexes() error {
 		}
 	}
 
-	return nil
-}
-
-// createDefaultOrganization creates a default organization if none exists
-func (d *Database) createDefaultOrganization() error {
-	var count int64
-	if err := d.DB.Model(&models.Organization{}).Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to count organizations: %w", err)
-	}
-
-	if count > 0 {
-		return nil // Organizations already exist
-	}
-
-	// Create default organization with supported algorithms
-	defaultAlgorithms := `{
-		"asymmetric": [
-			{
-				"name": "NTRU",
-				"description": "Решетчатый алгоритм",
-				"key_size": 1024,
-				"recommended": true
-			},
-			{
-				"name": "BIKE",
-				"description": "Код-основанный алгоритм",
-				"key_size": 2048,
-				"recommended": false
-			}
-		],
-		"symmetric": [
-			{
-				"name": "AES-256",
-				"description": "Стандарт шифрования",
-				"key_size": 256,
-				"recommended": true
-			},
-			{
-				"name": "ChaCha20",
-				"description": "Потоковый шифр",
-				"key_size": 256,
-				"recommended": false
-			}
-		],
-		"signature": [
-			{
-				"name": "Falcon",
-				"description": "Решетчатая подпись",
-				"key_size": 1024,
-				"recommended": true
-			},
-			{
-				"name": "Dilithium",
-				"description": "Модульная решетчатая подпись",
-				"key_size": 2048,
-				"recommended": false
-			}
-		]
-	}`
-
-	org := &models.Organization{
-		Name:                "Default Organization",
-		Domain:              "localhost",
-		SupportedAlgorithms: []byte(defaultAlgorithms),
-	}
-
-	if err := d.DB.Create(org).Error; err != nil {
-		return fmt.Errorf("failed to create default organization: %w", err)
-	}
-
-	log.Printf("Created default organization with ID: %s", org.ID)
 	return nil
 }
 

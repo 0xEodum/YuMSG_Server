@@ -16,31 +16,18 @@ const (
 	StatusOfflineDisconnected UserStatus = "offline_disconnected"
 )
 
-// Organization represents an organization entity
-type Organization struct {
-	ID                  uuid.UUID       `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	Name                string          `json:"name" gorm:"type:varchar(255);not null"`
-	Domain              string          `json:"domain" gorm:"type:varchar(255);unique"`
-	SupportedAlgorithms json.RawMessage `json:"supported_algorithms" gorm:"type:jsonb"`
-	CreatedAt           time.Time       `json:"created_at" gorm:"default:now()"`
-}
-
 // User represents a user entity
 type User struct {
-	ID             uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	OrganizationID uuid.UUID  `json:"organization_id" gorm:"type:uuid;not null"`
-	Username       string     `json:"username" gorm:"type:varchar(255);unique;not null"`
-	Email          string     `json:"email" gorm:"type:varchar(255)"`
-	PasswordHash   string     `json:"-" gorm:"type:varchar(255);not null"`
-	DisplayName    string     `json:"display_name" gorm:"type:varchar(255)"`
-	Status         UserStatus `json:"status" gorm:"type:varchar(30);default:'offline_disconnected'"`
-	LastSeen       *time.Time `json:"last_seen" gorm:"type:timestamp with time zone"`
-	CreatedAt      time.Time  `json:"created_at" gorm:"default:now()"`
-	UpdatedAt      time.Time  `json:"updated_at" gorm:"default:now()"`
-	IsBlocked      bool       `json:"is_blocked" gorm:"default:false"`
-
-	// Relations
-	Organization Organization `json:"organization,omitempty" gorm:"foreignKey:OrganizationID"`
+	ID           uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	Username     string     `json:"username" gorm:"type:varchar(255);unique;not null"`
+	Email        string     `json:"email" gorm:"type:varchar(255)"`
+	PasswordHash string     `json:"-" gorm:"type:varchar(255);not null"`
+	DisplayName  string     `json:"display_name" gorm:"type:varchar(255)"`
+	Status       UserStatus `json:"status" gorm:"type:varchar(30);default:'offline_disconnected'"`
+	LastSeen     *time.Time `json:"last_seen" gorm:"type:timestamp with time zone"`
+	CreatedAt    time.Time  `json:"created_at" gorm:"default:now()"`
+	UpdatedAt    time.Time  `json:"updated_at" gorm:"default:now()"`
+	IsBlocked    bool       `json:"is_blocked" gorm:"default:false"`
 }
 
 // ActiveConnection represents an active WebSocket connection

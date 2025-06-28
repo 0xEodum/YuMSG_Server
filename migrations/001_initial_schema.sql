@@ -6,19 +6,9 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Organizations table
-CREATE TABLE IF NOT EXISTS organizations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) NOT NULL,
-    domain VARCHAR(255) UNIQUE,
-    supported_algorithms JSONB,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
@@ -92,7 +82,6 @@ CREATE TABLE IF NOT EXISTS blocked_users (
 );
 
 -- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_users_organization ON users(organization_id);
 CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
 CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username));
 CREATE INDEX IF NOT EXISTS idx_users_display_name_gin ON users USING gin(to_tsvector('english', display_name));
@@ -145,55 +134,3 @@ BEGIN
     WHERE last_heartbeat < (NOW() - INTERVAL '5 minutes');
 END;
 $$ language 'plpgsql';
-
--- Insert default organization
-INSERT INTO organizations (id, name, domain, supported_algorithms) 
-VALUES (
-    '00000000-0000-0000-0000-000000000000',
-    'Default Organization',
-    'localhost',
-    '{
-        "asymmetric": [
-            {
-                "name": "NTRU",
-                "description": "Решетчатый алгоритм",
-                "key_size": 1024,
-                "recommended": true
-            },
-            {
-                "name": "BIKE",
-                "description": "Код-основанный алгоритм",
-                "key_size": 2048,
-                "recommended": false
-            }
-        ],
-        "symmetric": [
-            {
-                "name": "AES-256",
-                "description": "Стандарт шифрования",
-                "key_size": 256,
-                "recommended": true
-            },
-            {
-                "name": "ChaCha20",
-                "description": "Потоковый шифр",
-                "key_size": 256,
-                "recommended": false
-            }
-        ],
-        "signature": [
-            {
-                "name": "Falcon",
-                "description": "Решетчатая подпись",
-                "key_size": 1024,
-                "recommended": true
-            },
-            {
-                "name": "Dilithium",
-                "description": "Модульная решетчатая подпись",
-                "key_size": 2048,
-                "recommended": false
-            }
-        ]
-    }'::jsonb
-) ON CONFLICT (id) DO NOTHING;

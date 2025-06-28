@@ -247,8 +247,6 @@ func (h *AuthHandler) mapUserServiceError(err error) (string, int) {
 	switch {
 	case errors.Is(err, services.ErrUserAlreadyExists):
 		return "USERNAME_EXISTS", http.StatusConflict
-	case errors.Is(err, services.ErrOrganizationNotFound):
-		return "INVALID_DOMAIN", http.StatusBadRequest
 	case errors.Is(err, services.ErrInvalidUserData):
 		return "WEAK_PASSWORD", http.StatusBadRequest
 	case errors.Is(err, gorm.ErrDuplicatedKey):

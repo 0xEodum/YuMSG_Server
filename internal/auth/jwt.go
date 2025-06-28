@@ -25,9 +25,8 @@ var (
 
 // JWTClaims represents the claims in a JWT token
 type JWTClaims struct {
-	UserID         string `json:"user_id"`
-	Username       string `json:"username"`
-	OrganizationID string `json:"organization_id"`
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
@@ -54,9 +53,8 @@ func (j *JWTManager) GenerateToken(user *models.User) (string, time.Time, error)
 	expiresAt := time.Now().Add(j.expiryTime)
 
 	claims := &JWTClaims{
-		UserID:         user.ID.String(),
-		Username:       user.Username,
-		OrganizationID: user.OrganizationID.String(),
+		UserID:   user.ID.String(),
+		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -239,7 +237,6 @@ func (a *AuthService) AuthMiddleware() gin.HandlerFunc {
 		// Store claims in context for use in handlers
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
-		c.Set("organization_id", claims.OrganizationID)
 		c.Set("claims", claims)
 
 		c.Next()
@@ -266,7 +263,6 @@ func (a *AuthService) OptionalAuthMiddleware() gin.HandlerFunc {
 		// Store claims in context if valid
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
-		c.Set("organization_id", claims.OrganizationID)
 		c.Set("claims", claims)
 
 		c.Next()
@@ -291,26 +287,6 @@ func GetUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
 	}
 
 	return userID, nil
-}
-
-// GetOrganizationIDFromContext extracts organization ID from Gin context
-func GetOrganizationIDFromContext(c *gin.Context) (uuid.UUID, error) {
-	orgIDStr, exists := c.Get("organization_id")
-	if !exists {
-		return uuid.Nil, errors.New("organization ID not found in context")
-	}
-
-	orgIDString, ok := orgIDStr.(string)
-	if !ok {
-		return uuid.Nil, errors.New("invalid organization ID format in context")
-	}
-
-	orgID, err := uuid.Parse(orgIDString)
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("failed to parse organization ID: %w", err)
-	}
-
-	return orgID, nil
 }
 
 // GetUsernameFromContext extracts username from Gin context
