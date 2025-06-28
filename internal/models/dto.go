@@ -65,11 +65,10 @@ type ServerPolicies struct {
 
 // Auth DTOs
 type RegisterRequest struct {
-	Username           string `json:"username" binding:"required,email"`
-	Password           string `json:"password" binding:"required,min=8"`
-	DisplayName        string `json:"display_name" binding:"required"`
-	Email              string `json:"email" binding:"required,email"`
-	OrganizationDomain string `json:"organization_domain" binding:"required"`
+	Username    string `json:"username" binding:"required,email"`
+	Password    string `json:"password" binding:"required,min=8"`
+	DisplayName string `json:"display_name" binding:"required"`
+	Email       string `json:"email" binding:"required,email"`
 }
 
 type LoginRequest struct {
@@ -78,12 +77,11 @@ type LoginRequest struct {
 }
 
 type AuthResponse struct {
-	Success        bool               `json:"success"`
-	Message        string             `json:"message"`
-	Token          string             `json:"token,omitempty"`
-	TokenExpiresAt string             `json:"token_expires_at,omitempty"`
-	User           UserInfo           `json:"user"`
-	Organization   *OrganizationBrief `json:"organization,omitempty"`
+	Success        bool     `json:"success"`
+	Message        string   `json:"message"`
+	Token          string   `json:"token,omitempty"`
+	TokenExpiresAt string   `json:"token_expires_at,omitempty"`
+	User           UserInfo `json:"user"`
 }
 
 type UserInfo struct {
@@ -96,12 +94,6 @@ type UserInfo struct {
 	CreatedAt   string  `json:"created_at"`
 }
 
-type OrganizationBrief struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Domain string `json:"domain"`
-}
-
 // User DTOs
 type UserProfileResponse struct {
 	Success bool                `json:"success"`
@@ -109,15 +101,14 @@ type UserProfileResponse struct {
 }
 
 type DetailedUserProfile struct {
-	ID           string            `json:"id"`
-	Username     string            `json:"username"`
-	DisplayName  string            `json:"display_name"`
-	Email        string            `json:"email"`
-	Status       string            `json:"status"`
-	LastSeen     *string           `json:"last_seen"`
-	CreatedAt    string            `json:"created_at"`
-	Organization OrganizationBrief `json:"organization"`
-	Preferences  UserPreferences   `json:"preferences"`
+	ID          string          `json:"id"`
+	Username    string          `json:"username"`
+	DisplayName string          `json:"display_name"`
+	Email       string          `json:"email"`
+	Status      string          `json:"status"`
+	LastSeen    *string         `json:"last_seen"`
+	CreatedAt   string          `json:"created_at"`
+	Preferences UserPreferences `json:"preferences"`
 }
 
 type UpdateProfileRequest struct {

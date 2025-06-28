@@ -124,11 +124,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			LastSeen:    lastSeenStr,
 			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		},
-		Organization: &models.OrganizationBrief{
-			ID:     user.Organization.ID.String(),
-			Name:   user.Organization.Name,
-			Domain: user.Organization.Domain,
-		},
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -239,11 +234,6 @@ func (h *AuthHandler) ValidateToken(c *gin.Context) {
 			Status:      string(user.Status),
 			LastSeen:    lastSeenStr,
 			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
-		},
-		Organization: &models.OrganizationBrief{
-			ID:     user.Organization.ID.String(),
-			Name:   user.Organization.Name,
-			Domain: user.Organization.Domain,
 		},
 	}
 

@@ -84,11 +84,6 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 			Status:      string(user.Status),
 			LastSeen:    lastSeenStr,
 			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
-			Organization: models.OrganizationBrief{
-				ID:     user.Organization.ID.String(),
-				Name:   user.Organization.Name,
-				Domain: user.Organization.Domain,
-			},
 			Preferences: models.UserPreferences{
 				SelectedAlgorithms: models.AlgorithmSelection{
 					Asymmetric: "NTRU",    // Default values

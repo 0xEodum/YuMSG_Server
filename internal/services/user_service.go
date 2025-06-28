@@ -43,12 +43,9 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 		return nil, err
 	}
 
-	// Check if organization domain matches our server's organization
-	org, err := s.orgService.GetOrganizationByDomain(req.OrganizationDomain)
+	// Get default organization from config
+	org, err := s.orgService.GetOrganizationByDomain(s.orgService.config.App.Organization.Domain)
 	if err != nil {
-		if errors.Is(err, ErrOrganizationNotFound) {
-			return nil, ErrOrganizationNotFound
-		}
 		return nil, fmt.Errorf("failed to get organization: %w", err)
 	}
 
@@ -351,10 +348,6 @@ func (s *UserService) validateRegisterRequest(req *models.RegisterRequest) error
 
 	if req.Email == "" {
 		return errors.New("email is required")
-	}
-
-	if req.OrganizationDomain == "" {
-		return errors.New("organization domain is required")
 	}
 
 	// Basic email validation
