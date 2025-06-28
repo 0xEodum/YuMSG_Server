@@ -14,25 +14,22 @@ import (
 )
 
 var (
-	ErrUserNotFound         = errors.New("user not found")
-	ErrUserAlreadyExists    = errors.New("user already exists")
-	ErrInvalidUserData      = errors.New("invalid user data")
-	ErrOrganizationNotFound = errors.New("organization not found")
+	ErrUserNotFound      = errors.New("user not found")
+	ErrUserAlreadyExists = errors.New("user already exists")
+	ErrInvalidUserData   = errors.New("invalid user data")
 )
 
 // UserService handles user-related operations
 type UserService struct {
 	db          *gorm.DB
 	authService *auth.AuthService
-	orgService  *OrganizationService
 }
 
 // NewUserService creates a new user service
-func NewUserService(db *gorm.DB, authService *auth.AuthService, orgService *OrganizationService) *UserService {
+func NewUserService(db *gorm.DB, authService *auth.AuthService) *UserService {
 	return &UserService{
 		db:          db,
 		authService: authService,
-		orgService:  orgService,
 	}
 }
 
@@ -41,12 +38,6 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 	// Validate input
 	if err := s.validateRegisterRequest(req); err != nil {
 		return nil, err
-	}
-
-	// Get default organization from config
-	org, err := s.orgService.GetOrganizationByDomain(s.orgService.config.App.Organization.Domain)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get organization: %w", err)
 	}
 
 	// Check if user already exists
@@ -63,21 +54,20 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 
 	// Create user
 	user := &models.User{
-		OrganizationID: org.ID,
-		Username:       strings.ToLower(req.Username),
-		Email:          req.Email,
-		PasswordHash:   hashedPassword,
-		DisplayName:    req.DisplayName,
-		Status:         models.StatusOfflineDisconnected,
+		Username:     strings.ToLower(req.Username),
+		Email:        req.Email,
+		PasswordHash: hashedPassword,
+		DisplayName:  req.DisplayName,
+		Status:       models.StatusOfflineDisconnected,
 	}
 
 	if err := s.db.Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	// Load organization relationship
-	if err := s.db.Preload("Organization").First(user, user.ID).Error; err != nil {
-		return nil, fmt.Errorf("failed to load user organization: %w", err)
+	// Reload created user
+	if err := s.db.First(user, user.ID).Error; err != nil {
+		return nil, fmt.Errorf("failed to reload user: %w", err)
 	}
 
 	return user, nil
@@ -87,7 +77,7 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 func (s *UserService) AuthenticateUser(req *models.LoginRequest) (*models.User, string, time.Time, error) {
 	// Find user by username
 	var user models.User
-	if err := s.db.Preload("Organization").Where("username = ?", strings.ToLower(req.Username)).First(&user).Error; err != nil {
+	if err := s.db.Where("username = ?", strings.ToLower(req.Username)).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, "", time.Time{}, auth.ErrInvalidCredentials
 		}
@@ -124,7 +114,7 @@ func (s *UserService) AuthenticateUser(req *models.LoginRequest) (*models.User, 
 // GetUserByID retrieves a user by ID
 func (s *UserService) GetUserByID(userID uuid.UUID) (*models.User, error) {
 	var user models.User
-	if err := s.db.Preload("Organization").First(&user, userID).Error; err != nil {
+	if err := s.db.First(&user, userID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrUserNotFound
 		}
@@ -137,7 +127,7 @@ func (s *UserService) GetUserByID(userID uuid.UUID) (*models.User, error) {
 // GetUserByUsername retrieves a user by username
 func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
 	var user models.User
-	if err := s.db.Preload("Organization").Where("username = ?", strings.ToLower(username)).First(&user).Error; err != nil {
+	if err := s.db.Where("username = ?", strings.ToLower(username)).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrUserNotFound
 		}
@@ -170,8 +160,8 @@ func (s *UserService) UpdateUserProfile(userID uuid.UUID, req *models.UpdateProf
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
-	// Reload with organization
-	if err := s.db.Preload("Organization").First(&user, user.ID).Error; err != nil {
+	// Reload user
+	if err := s.db.First(&user, user.ID).Error; err != nil {
 		return nil, fmt.Errorf("failed to reload user: %w", err)
 	}
 
@@ -300,7 +290,7 @@ func (s *UserService) GetAllUsers(limit, offset int, status string, sortBy strin
 	var users []models.User
 	var total int64
 
-	query := s.db.Preload("Organization").Where("1 = 1")
+	query := s.db.Where("1 = 1")
 
 	// Apply status filter
 	if status != "all" && status != "" {
