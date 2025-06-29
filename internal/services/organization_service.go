@@ -35,9 +35,7 @@ func (s *OrganizationService) GetOrganizationInfo() (*models.OrganizationInfo, e
 	// No need to query database - 1 server = 1 organization
 
 	orgInfo := &models.OrganizationInfo{
-		ID:     s.config.App.Organization.ID,
-		Name:   s.config.App.Organization.Name,
-		Domain: s.config.App.Organization.Domain,
+		Name: s.config.App.Organization.Name,
 		ServerPolicies: models.ServerPolicies{
 			MaxFileSize:                s.config.App.ServerPolicies.MaxFileSize,
 			MessageRetentionDays:       s.config.App.ServerPolicies.MessageRetentionDays,

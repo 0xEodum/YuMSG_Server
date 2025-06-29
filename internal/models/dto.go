@@ -36,9 +36,7 @@ type OrganizationInfoResponse struct {
 }
 
 type OrganizationInfo struct {
-	ID                  string              `json:"id"`
 	Name                string              `json:"name"`
-	Domain              string              `json:"domain"`
 	SupportedAlgorithms SupportedAlgorithms `json:"supported_algorithms"`
 	ServerPolicies      ServerPolicies      `json:"server_policies"`
 }
