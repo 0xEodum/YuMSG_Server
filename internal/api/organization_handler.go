@@ -76,9 +76,7 @@ func (h *OrganizationHandler) GetOrganizationStats(c *gin.Context) {
 	response := map[string]interface{}{
 		"success": true,
 		"organization": map[string]interface{}{
-			"id":     orgInfo.ID,
-			"name":   orgInfo.Name,
-			"domain": orgInfo.Domain,
+			"name": orgInfo.Name,
 		},
 		"message": "Organization statistics endpoint - implement detailed stats as needed",
 	}
