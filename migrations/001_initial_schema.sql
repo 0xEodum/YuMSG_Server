@@ -9,8 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username VARCHAR(255) UNIQUE NOT NULL,
-    email VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     display_name VARCHAR(255),
     status VARCHAR(30) DEFAULT 'offline_disconnected',
@@ -19,8 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     is_blocked BOOLEAN DEFAULT FALSE,
     
-    CONSTRAINT valid_status CHECK (status IN ('online', 'offline_connected', 'offline_disconnected')),
-    CONSTRAINT valid_username_format CHECK (username ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    CONSTRAINT valid_status CHECK (status IN ('online', 'offline_connected', 'offline_disconnected'))
 );
 
 -- Active WebSocket connections table
@@ -83,7 +81,7 @@ CREATE TABLE IF NOT EXISTS blocked_users (
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
-CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username));
+CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users(LOWER(email));
 CREATE INDEX IF NOT EXISTS idx_users_display_name_gin ON users USING gin(to_tsvector('english', display_name));
 
 CREATE INDEX IF NOT EXISTS idx_active_connections_user ON active_connections(user_id);

@@ -25,8 +25,8 @@ var (
 
 // JWTClaims represents the claims in a JWT token
 type JWTClaims struct {
-	UserID   string `json:"user_id"`
-	Username string `json:"username"`
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -53,8 +53,8 @@ func (j *JWTManager) GenerateToken(user *models.User) (string, time.Time, error)
 	expiresAt := time.Now().Add(j.expiryTime)
 
 	claims := &JWTClaims{
-		UserID:   user.ID.String(),
-		Username: user.Username,
+		UserID: user.ID.String(),
+		Email:  user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -236,7 +236,7 @@ func (a *AuthService) AuthMiddleware() gin.HandlerFunc {
 
 		// Store claims in context for use in handlers
 		c.Set("user_id", claims.UserID)
-		c.Set("username", claims.Username)
+		c.Set("email", claims.Email)
 		c.Set("claims", claims)
 
 		c.Next()
@@ -262,7 +262,7 @@ func (a *AuthService) OptionalAuthMiddleware() gin.HandlerFunc {
 
 		// Store claims in context if valid
 		c.Set("user_id", claims.UserID)
-		c.Set("username", claims.Username)
+		c.Set("email", claims.Email)
 		c.Set("claims", claims)
 
 		c.Next()
@@ -289,17 +289,17 @@ func GetUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
 	return userID, nil
 }
 
-// GetUsernameFromContext extracts username from Gin context
-func GetUsernameFromContext(c *gin.Context) (string, error) {
-	username, exists := c.Get("username")
+// GetEmailFromContext extracts user email from Gin context
+func GetEmailFromContext(c *gin.Context) (string, error) {
+	email, exists := c.Get("email")
 	if !exists {
-		return "", errors.New("username not found in context")
+		return "", errors.New("email not found in context")
 	}
 
-	usernameStr, ok := username.(string)
+	emailStr, ok := email.(string)
 	if !ok {
-		return "", errors.New("invalid username format in context")
+		return "", errors.New("invalid email format in context")
 	}
 
-	return usernameStr, nil
+	return emailStr, nil
 }

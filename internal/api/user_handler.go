@@ -78,7 +78,6 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 		Success: true,
 		User: models.DetailedUserProfile{
 			ID:          user.ID.String(),
-			Username:    user.Username,
 			DisplayName: user.DisplayName,
 			Email:       user.Email,
 			Status:      string(user.Status),
@@ -151,7 +150,6 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		Message: "Профиль успешно обновлен",
 		Data: map[string]interface{}{
 			"id":           updatedUser.ID.String(),
-			"username":     updatedUser.Username,
 			"display_name": updatedUser.DisplayName,
 			"email":        updatedUser.Email,
 			"status":       string(updatedUser.Status),
@@ -226,7 +224,6 @@ func (h *UserHandler) SearchUsers(c *gin.Context) {
 
 		searchResults = append(searchResults, models.SearchUserResult{
 			ID:            user.ID.String(),
-			Username:      user.Username,
 			DisplayName:   user.DisplayName,
 			Status:        string(user.Status),
 			LastSeen:      lastSeenStr,
@@ -302,7 +299,6 @@ func (h *UserHandler) GetUserStatus(c *gin.Context) {
 		Success: true,
 		User: models.UserStatusInfo{
 			ID:             targetUser.ID.String(),
-			Username:       targetUser.Username,
 			DisplayName:    targetUser.DisplayName,
 			Status:         string(targetUser.Status),
 			LastSeen:       lastSeenStr,
@@ -409,7 +405,6 @@ func (h *UserHandler) GetOnlineUsers(c *gin.Context) {
 
 			onlineUsers = append(onlineUsers, models.SearchUserResult{
 				ID:            user.ID.String(),
-				Username:      user.Username,
 				DisplayName:   user.DisplayName,
 				Status:        string(user.Status),
 				LastSeen:      lastSeenStr,

@@ -62,7 +62,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Message: "Пользователь успешно зарегистрирован",
 		User: models.UserInfo{
 			ID:          user.ID.String(),
-			Username:    user.Username,
 			DisplayName: user.DisplayName,
 			Email:       user.Email,
 			Status:      string(user.Status),
@@ -117,7 +116,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		TokenExpiresAt: expiresAt.Format(time.RFC3339),
 		User: models.UserInfo{
 			ID:          user.ID.String(),
-			Username:    user.Username,
 			DisplayName: user.DisplayName,
 			Email:       user.Email,
 			Status:      string(user.Status),
@@ -228,7 +226,6 @@ func (h *AuthHandler) ValidateToken(c *gin.Context) {
 		Message: "Token is valid",
 		User: models.UserInfo{
 			ID:          user.ID.String(),
-			Username:    user.Username,
 			DisplayName: user.DisplayName,
 			Email:       user.Email,
 			Status:      string(user.Status),

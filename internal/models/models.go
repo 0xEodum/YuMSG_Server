@@ -19,8 +19,7 @@ const (
 // User represents a user entity
 type User struct {
 	ID           uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	Username     string     `json:"username" gorm:"type:varchar(255);unique;not null"`
-	Email        string     `json:"email" gorm:"type:varchar(255)"`
+	Email        string     `json:"email" gorm:"type:varchar(255);unique;not null"`
 	PasswordHash string     `json:"-" gorm:"type:varchar(255);not null"`
 	DisplayName  string     `json:"display_name" gorm:"type:varchar(255)"`
 	Status       UserStatus `json:"status" gorm:"type:varchar(30);default:'offline_disconnected'"`

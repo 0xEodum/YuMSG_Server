@@ -42,7 +42,7 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 
 	// Check if user already exists
 	var existingUser models.User
-	if err := s.db.Where("username = ?", strings.ToLower(req.Username)).First(&existingUser).Error; err == nil {
+	if err := s.db.Where("email = ?", strings.ToLower(req.Email)).First(&existingUser).Error; err == nil {
 		return nil, ErrUserAlreadyExists
 	}
 
@@ -54,8 +54,7 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 
 	// Create user
 	user := &models.User{
-		Username:     strings.ToLower(req.Username),
-		Email:        req.Email,
+		Email:        strings.ToLower(req.Email),
 		PasswordHash: hashedPassword,
 		DisplayName:  req.DisplayName,
 		Status:       models.StatusOfflineDisconnected,
@@ -75,9 +74,9 @@ func (s *UserService) CreateUser(req *models.RegisterRequest) (*models.User, err
 
 // AuthenticateUser authenticates a user and returns a JWT token
 func (s *UserService) AuthenticateUser(req *models.LoginRequest) (*models.User, string, time.Time, error) {
-	// Find user by username
+	// Find user by email
 	var user models.User
-	if err := s.db.Where("username = ?", strings.ToLower(req.Username)).First(&user).Error; err != nil {
+	if err := s.db.Where("email = ?", strings.ToLower(req.Email)).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, "", time.Time{}, auth.ErrInvalidCredentials
 		}
@@ -124,19 +123,6 @@ func (s *UserService) GetUserByID(userID uuid.UUID) (*models.User, error) {
 	return &user, nil
 }
 
-// GetUserByUsername retrieves a user by username
-func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
-	var user models.User
-	if err := s.db.Where("username = ?", strings.ToLower(username)).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrUserNotFound
-		}
-		return nil, fmt.Errorf("failed to get user: %w", err)
-	}
-
-	return &user, nil
-}
-
 // UpdateUserProfile updates user profile information
 func (s *UserService) UpdateUserProfile(userID uuid.UUID, req *models.UpdateProfileRequest) (*models.User, error) {
 	var user models.User
@@ -168,7 +154,7 @@ func (s *UserService) UpdateUserProfile(userID uuid.UUID, req *models.UpdateProf
 	return &user, nil
 }
 
-// SearchUsers searches for users by query (username or display name)
+// SearchUsers searches for users by query (email or display name)
 func (s *UserService) SearchUsers(query string, limit, offset int, currentUserID uuid.UUID) ([]models.User, int, error) {
 	if len(query) < 2 {
 		return nil, 0, errors.New("query must be at least 2 characters")
@@ -181,7 +167,7 @@ func (s *UserService) SearchUsers(query string, limit, offset int, currentUserID
 
 	// Since 1 server = 1 organization, no need to filter by organization_id
 	baseQuery := s.db.Where("id != ? AND is_blocked = false", currentUserID).
-		Where("(LOWER(username) LIKE ? OR LOWER(display_name) LIKE ?)", searchQuery, searchQuery)
+		Where("(LOWER(email) LIKE ? OR LOWER(display_name) LIKE ?)", searchQuery, searchQuery)
 
 	// Count total results
 	if err := baseQuery.Model(&models.User{}).Count(&total).Error; err != nil {
@@ -304,8 +290,8 @@ func (s *UserService) GetAllUsers(limit, offset int, status string, sortBy strin
 
 	// Apply sorting
 	switch sortBy {
-	case "username":
-		query = query.Order("username ASC")
+	case "email":
+		query = query.Order("email ASC")
 	case "status":
 		query = query.Order("status ASC, display_name ASC")
 	case "last_seen":
@@ -324,9 +310,6 @@ func (s *UserService) GetAllUsers(limit, offset int, status string, sortBy strin
 
 // validateRegisterRequest validates user registration data
 func (s *UserService) validateRegisterRequest(req *models.RegisterRequest) error {
-	if req.Username == "" {
-		return errors.New("username is required")
-	}
 
 	if len(req.Password) < 8 {
 		return errors.New("password must be at least 8 characters")
@@ -341,8 +324,8 @@ func (s *UserService) validateRegisterRequest(req *models.RegisterRequest) error
 	}
 
 	// Basic email validation
-	if !strings.Contains(req.Username, "@") || !strings.Contains(req.Username, ".") {
-		return errors.New("username must be a valid email address")
+	if !strings.Contains(req.Email, "@") || !strings.Contains(req.Email, ".") {
+		return errors.New("email must be a valid email address")
 	}
 
 	return nil
