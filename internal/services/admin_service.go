@@ -184,7 +184,6 @@ func (s *AdminService) GetAllUsersForAdmin(limit, offset int, statusFilter, sort
 
 		adminUser := models.AdminUserInfo{
 			ID:                user.ID.String(),
-			Username:          user.Username,
 			DisplayName:       user.DisplayName,
 			Email:             user.Email,
 			Status:            string(user.Status),
@@ -248,7 +247,6 @@ func (s *AdminService) BlockUserByAdmin(userID, adminID uuid.UUID, req *models.B
 
 	blockedUserInfo := &models.BlockedUserInfo{
 		ID:           blockedUser.User.ID.String(),
-		Username:     blockedUser.User.Username,
 		BlockedUntil: blockedUntilStr,
 		Reason:       blockedUser.Reason,
 		BlockedBy:    blockedUser.AdminUser.ID.String(),
@@ -291,7 +289,6 @@ func (s *AdminService) GetBlockedUsers() ([]models.BlockedUserInfo, error) {
 
 		info := models.BlockedUserInfo{
 			ID:           blocked.User.ID.String(),
-			Username:     blocked.User.Username,
 			BlockedUntil: blockedUntilStr,
 			Reason:       blocked.Reason,
 			BlockedBy:    blocked.AdminUser.ID.String(),
@@ -369,7 +366,7 @@ func (s *AdminService) IsUserAdmin(userID uuid.UUID) (bool, error) {
 		return false, err
 	}
 
-	// Simple admin check - first registered user or specific username
+	// Simple admin check - first registered user
 	var firstUser models.User
 	if err := s.db.Order("created_at ASC").First(&firstUser).Error; err != nil {
 		return false, err

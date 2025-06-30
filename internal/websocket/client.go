@@ -324,7 +324,7 @@ func (c *Client) GetInfo() map[string]interface{} {
 	return map[string]interface{}{
 		"id":             c.ID,
 		"user_id":        c.UserID.String(),
-		"username":       c.Username,
+		"email":          c.Email,
 		"ip_address":     c.IPAddress,
 		"user_agent":     c.UserAgent,
 		"last_heartbeat": c.GetLastHeartbeat().Format(time.RFC3339),

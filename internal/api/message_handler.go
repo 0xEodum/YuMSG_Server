@@ -162,8 +162,6 @@ func (h *MessageHandler) GetPendingMessages(c *gin.Context) {
 		senderName := "Unknown"
 		if msg.Sender.DisplayName != "" {
 			senderName = msg.Sender.DisplayName
-		} else if msg.Sender.Username != "" {
-			senderName = msg.Sender.Username
 		}
 
 		responseMsg := models.PendingMessage{
@@ -298,13 +296,13 @@ func (h *MessageHandler) CreateChat(c *gin.Context) {
 	participants := []models.UserInfo{
 		{
 			ID:          chatMetadata.User1.ID.String(),
-			Username:    chatMetadata.User1.Username,
 			DisplayName: chatMetadata.User1.DisplayName,
+			Email:       chatMetadata.User1.Email,
 		},
 		{
 			ID:          chatMetadata.User2.ID.String(),
-			Username:    chatMetadata.User2.Username,
 			DisplayName: chatMetadata.User2.DisplayName,
+			Email:       chatMetadata.User2.Email,
 		},
 	}
 
@@ -438,13 +436,13 @@ func (h *MessageHandler) GetUserChats(c *gin.Context) {
 		participants := []models.UserInfo{
 			{
 				ID:          chat.User1.ID.String(),
-				Username:    chat.User1.Username,
 				DisplayName: chat.User1.DisplayName,
+				Email:       chat.User1.Email,
 			},
 			{
 				ID:          chat.User2.ID.String(),
-				Username:    chat.User2.Username,
 				DisplayName: chat.User2.DisplayName,
+				Email:       chat.User2.Email,
 			},
 		}
 

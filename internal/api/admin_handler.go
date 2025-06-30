@@ -104,7 +104,7 @@ func (h *AdminHandler) GetAllUsers(c *gin.Context) {
 	validSorts := map[string]bool{
 		"created_at":   true,
 		"last_seen":    true,
-		"username":     true,
+		"email":        true,
 		"status":       true,
 		"display_name": true,
 	}

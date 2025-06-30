@@ -97,7 +97,7 @@ func (d *Database) AutoMigrate() error {
 func (d *Database) createIndexes() error {
 	indexes := []string{
 		"CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)",
-		"CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username))",
+		"CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users(LOWER(email))",
 		"CREATE INDEX IF NOT EXISTS idx_users_display_name_gin ON users USING gin(to_tsvector('english', display_name))",
 		"CREATE INDEX IF NOT EXISTS idx_active_connections_user ON active_connections(user_id)",
 		"CREATE INDEX IF NOT EXISTS idx_active_connections_last_heartbeat ON active_connections(last_heartbeat)",

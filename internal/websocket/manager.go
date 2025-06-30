@@ -32,7 +32,7 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	ID            string
 	UserID        uuid.UUID
-	Username      string
+	Email         string
 	Connection    *websocket.Conn
 	Send          chan []byte
 	Manager       *Manager
@@ -145,7 +145,7 @@ func (m *Manager) HandleWebSocket(c *gin.Context) {
 	client := &Client{
 		ID:            uuid.New().String(),
 		UserID:        userID,
-		Username:      claims.Username,
+		Email:         claims.Email,
 		Connection:    conn,
 		Send:          make(chan []byte, 256),
 		Manager:       m,
@@ -198,7 +198,7 @@ func (m *Manager) registerClient(client *Client) {
 	}
 	m.userClients[client.UserID][client.ID] = client
 
-	log.Printf("Client registered: %s for user %s", client.ID, client.Username)
+	log.Printf("Client registered: %s for user %s", client.ID, client.Email)
 
 	// Update user status to online
 	if err := m.userService.UpdateUserStatus(client.UserID, models.StatusOnline); err != nil {
@@ -264,7 +264,7 @@ func (m *Manager) unregisterClient(client *Client) {
 	// Remove connection from database
 	m.removeConnection(client)
 
-	log.Printf("Client unregistered: %s for user %s", client.ID, client.Username)
+	log.Printf("Client unregistered: %s for user %s", client.ID, client.Email)
 }
 
 // SendToUser sends a message to a specific user

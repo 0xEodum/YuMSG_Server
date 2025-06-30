@@ -63,14 +63,13 @@ type ServerPolicies struct {
 
 // Auth DTOs
 type RegisterRequest struct {
-	Username    string `json:"username" binding:"required,email"`
 	Password    string `json:"password" binding:"required,min=8"`
 	DisplayName string `json:"display_name" binding:"required"`
 	Email       string `json:"email" binding:"required,email"`
 }
 
 type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -84,7 +83,6 @@ type AuthResponse struct {
 
 type UserInfo struct {
 	ID          string  `json:"id"`
-	Username    string  `json:"username"`
 	DisplayName string  `json:"display_name"`
 	Email       string  `json:"email"`
 	Status      string  `json:"status"`
@@ -100,7 +98,6 @@ type UserProfileResponse struct {
 
 type DetailedUserProfile struct {
 	ID          string          `json:"id"`
-	Username    string          `json:"username"`
 	DisplayName string          `json:"display_name"`
 	Email       string          `json:"email"`
 	Status      string          `json:"status"`
@@ -126,7 +123,6 @@ type UserSearchResponse struct {
 
 type SearchUserResult struct {
 	ID            string  `json:"id"`
-	Username      string  `json:"username"`
 	DisplayName   string  `json:"display_name"`
 	Status        string  `json:"status"`
 	LastSeen      *string `json:"last_seen"`
@@ -140,7 +136,6 @@ type UserStatusResponse struct {
 
 type UserStatusInfo struct {
 	ID             string         `json:"id"`
-	Username       string         `json:"username"`
 	DisplayName    string         `json:"display_name"`
 	Status         string         `json:"status"`
 	LastSeen       *string        `json:"last_seen"`
@@ -259,7 +254,6 @@ type AdminUsersResponse struct {
 
 type AdminUserInfo struct {
 	ID                string  `json:"id"`
-	Username          string  `json:"username"`
 	DisplayName       string  `json:"display_name"`
 	Email             string  `json:"email"`
 	Status            string  `json:"status"`
@@ -285,7 +279,6 @@ type BlockUserResponse struct {
 
 type BlockedUserInfo struct {
 	ID           string  `json:"id"`
-	Username     string  `json:"username"`
 	BlockedUntil *string `json:"blocked_until"`
 	Reason       string  `json:"reason"`
 	BlockedBy    string  `json:"blocked_by"`
